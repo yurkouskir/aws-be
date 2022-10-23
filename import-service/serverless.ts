@@ -5,7 +5,7 @@ import importFileParser from '@functions/importFileParser';
 const serverlessConfiguration: AWS = {
   service: 'import-service',
   frameworkVersion: '3',
-  plugins: ['serverless-esbuild', 'serverless-offline'],
+  plugins: ['serverless-auto-swagger', 'serverless-esbuild', 'serverless-offline'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -24,7 +24,7 @@ const serverlessConfiguration: AWS = {
         Effect: "Allow",
         Action: "s3:*",
         Resource: [
-          "arn:aws:s3:::product-service-products-file-upload-bucket/*",
+          '${env:S3_UPLOAD_BUCKET_ARN}',
         ]
       }
     ],
@@ -44,6 +44,7 @@ const serverlessConfiguration: AWS = {
       concurrency: 10,
     },
   },
+  useDotenv: true,
 };
 
 module.exports = serverlessConfiguration;
