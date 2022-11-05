@@ -1,11 +1,12 @@
 import type { AWS } from '@serverless/typescript';
 import { getProductsList } from '@functions/getProductsList';
 import { getProductById } from '@functions/getProductById';
+import { createProduct } from '@functions/createProduct';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service',
   frameworkVersion: '3',
-  plugins: ['serverless-auto-swagger', 'serverless-esbuild', 'serverless-offline'],
+  plugins: ['serverless-auto-swagger', 'serverless-esbuild', 'serverless-dynamodb-local', 'serverless-offline'],
   provider: {
     name: 'aws',
     runtime: 'nodejs14.x',
@@ -18,17 +19,33 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      PRODUCTS_TABLE: '${env:PRODUCTS_TABLE}',
+      STOCKS_TABLE: '${env:STOCKS_TABLE}',
     },
+    iamRoleStatements: [
+      {
+        Effect: 'Allow',
+        Action: [
+          'dynamodb:Query',
+          'dynamodb:Scan',
+          'dynamodb:GetItem',
+          'dynamodb:PutItem'
+        ],
+        Resource: '*'
+      }
+    ]
   },
   // import the function via paths
   functions: {
     getProductsList,
     getProductById,
+    createProduct,
   },
   package: { individually: true },
   custom: {
     autoswagger: {
-      host: "xvucazdqz0.execute-api.eu-west-1.amazonaws.com/dev/"
+      host: "xvucazdqz0.execute-api.eu-west-1.amazonaws.com/dev/",
+      typefiles: ["./src/types/api-types.d.ts"]
     },
     esbuild: {
       bundle: true,
@@ -40,7 +57,15 @@ const serverlessConfiguration: AWS = {
       platform: 'node',
       concurrency: 10,
     },
+    dynamodb: {
+      start: {
+        port: 5000,
+        inMemory: true,
+        migrate: true,
+      }
+    }
   },
+  useDotenv: true,
 };
 
 module.exports = serverlessConfiguration;

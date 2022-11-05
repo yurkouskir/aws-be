@@ -1,22 +1,24 @@
 {
-  "name": "product-service",
+  "name": "import-service",
   "version": "1.0.0",
   "description": "Serverless aws-nodejs-typescript template",
   "main": "serverless.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "serverless deploy",
     "offline": "serverless offline",
-    "load-products": "aws dynamodb batch-write-item --request-items file://database/mocks/Products.json",
-    "load-stocks": "aws dynamodb batch-write-item --request-items file://database/mocks/Stocks.json"
+    "deploy": "serverless deploy"
   },
   "engines": {
     "node": ">=14.15.0"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.194.0",
+    "@aws-sdk/s3-request-presigner": "^3.194.0",
     "@middy/core": "^2.5.3",
     "@middy/http-cors": "^3.5.0",
     "@middy/http-json-body-parser": "^2.5.3",
+    "aws-sdk": "^2.1238.0",
+    "csv-parser": "^3.0.0",
     "serverless-offline": "^10.2.1"
   },
   "devDependencies": {
@@ -27,7 +29,6 @@
     "json-schema-to-ts": "^1.5.0",
     "serverless": "^3.0.0",
     "serverless-auto-swagger": "^2.9.2",
-    "serverless-dynamodb-local": "^0.2.40",
     "serverless-esbuild": "^1.23.3",
     "ts-node": "^10.4.0",
     "tsconfig-paths": "^3.9.0",

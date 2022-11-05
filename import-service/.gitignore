@@ -4,11 +4,8 @@ jspm_packages
 
 # Serverless directories
 .serverless
-.dynamodb
-
-# Environment variables
-.env
 
 # esbuild directories
 .esbuild
-.idea
+
+.env
