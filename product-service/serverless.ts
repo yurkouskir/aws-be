@@ -2,6 +2,7 @@ import type { AWS } from '@serverless/typescript';
 import { getProductsList } from '@functions/getProductsList';
 import { getProductById } from '@functions/getProductById';
 import { createProduct } from '@functions/createProduct';
+import { catalogBatchProcess } from '@functions/catalogBatchProcess';
 
 const serverlessConfiguration: AWS = {
   service: 'product-service',
@@ -21,6 +22,7 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       PRODUCTS_TABLE: '${env:PRODUCTS_TABLE}',
       STOCKS_TABLE: '${env:STOCKS_TABLE}',
+      SNS_ARN: 'SNSTopic'
     },
     iamRoleStatements: [
       {
@@ -32,6 +34,13 @@ const serverlessConfiguration: AWS = {
           'dynamodb:PutItem'
         ],
         Resource: '*'
+      },
+      {
+        Effect: 'Allow',
+        Action: 'sns:*',
+        Resource: {
+          Ref: 'SNSTopic'
+        }
       }
     ]
   },
@@ -40,6 +49,7 @@ const serverlessConfiguration: AWS = {
     getProductsList,
     getProductById,
     createProduct,
+    catalogBatchProcess,
   },
   package: { individually: true },
   custom: {
@@ -64,6 +74,26 @@ const serverlessConfiguration: AWS = {
         migrate: true,
       }
     }
+  },
+  resources: {
+    Resources: {
+      SNSTopic: {
+        Type: 'AWS::SNS::Topic',
+        Properties: {
+          TopicName: 'createProductTopic'
+        }
+      },
+      SNSSubscription: {
+        Type: 'AWS::SNS::Subscription',
+        Properties: {
+          Endpoint: 'r.yurkouski@gmail.com',
+          Protocol: 'email',
+          TopicArn: {
+            Ref: 'SNSTopic'
+          }
+        }
+      },
+    },
   },
   useDotenv: true,
 };

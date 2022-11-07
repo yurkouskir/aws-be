@@ -1,6 +1,7 @@
 import { DocumentClient } from 'aws-sdk/clients/dynamodb';
 import { createDynamoDBClient } from 'src/database/db';
 import { ProductInStock } from '@libs/models/product-in-stock';
+import { GuidGenerator } from '@libs/guid-generator';
 
 const { PRODUCTS_TABLE, STOCKS_TABLE } = process.env;
 
@@ -61,7 +62,9 @@ class ProductsService {
     }
 
     public async createProduct(productInStock: ProductInStock): Promise<any> {
-        const { title, description, count, id, price } = productInStock;
+        const { title, description, count, price } = productInStock;
+        const id = GuidGenerator.generateGuid();
+
         const product = this.docClient
             .put(
                 {

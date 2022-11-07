@@ -4,10 +4,12 @@ import { S3Event } from 'aws-lambda';
 import AWS from 'aws-sdk';
 import csvParser from 'csv-parser';
 import { ApiError } from '@libs/api-models/api-error';
+import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 
 const importFileParser = async (event: S3Event) => {
     const s3 = new AWS.S3({ region: 'eu-west-1' });
-    const aggregatedData = [];
+    const sqsClient = new SQSClient({ region: 'eu-west-1' });
+    const messages = [];
 
     for (const record of event.Records) {
         const path = record.s3.object.key;
@@ -20,9 +22,20 @@ const importFileParser = async (event: S3Event) => {
 
         await new Promise<void>((resolve, reject) => {
             s3Stream
-                .pipe(csvParser())
+                .pipe(csvParser({
+                    headers: ['title', 'description', 'count', 'price'],
+                    skipLines: 1,
+                }))
                 .on('data', data => {
-                    aggregatedData.push(data);
+                    const product = JSON.stringify(data);
+                        messages.push(
+                            sqsClient.send(
+                                new SendMessageCommand({
+                                    QueueUrl: process.env.SQS_URL,
+                                    MessageBody: product,
+                                })
+                            )
+                        )
                 })
                 .on('error', error => {
                     reject(new ApiError(error, 'Error loading file', 503));
@@ -39,7 +52,12 @@ const importFileParser = async (event: S3Event) => {
                         Key: record.s3.object.key
                     }).promise();
 
-                    resolve();
+                    try {
+                        await Promise.all(messages);
+                        resolve();
+                    } catch(e) {
+                        console.log(e)
+                    }
                 })
         })
     }
