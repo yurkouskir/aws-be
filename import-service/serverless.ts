@@ -64,6 +64,19 @@ const serverlessConfiguration: AWS = {
           QueueName: 'catalogItemsQueue'
         }
       },
+      GatewayResponseDefault4xx: {
+        Type: 'AWS::ApiGateway::GatewayResponse',
+        Properties: {
+          ResponseParameters: {
+            'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+            'gatewayresponse.header.Access-Control-Allow-Headers': "'*'",
+          },
+          ResponseType: 'DEFAULT_4XX',
+          RestApiId: {
+            Ref: 'ApiGatewayRestApi',
+          }
+        }
+      }
     }
   },
 };

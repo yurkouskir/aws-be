@@ -7,8 +7,6 @@ const snsClient = new SNSClient({ region: 'eu-west-1' });
 
 const catalogBatchProcess: ValidatedEventAPIGatewayProxyEvent<any> = async (event: any) => {
     const products = event.Records.map(({ body }) => body);
-    console.log('batch products')
-    console.log(products);
     for (const product of products) {
         try {
             const productInStock = new ProductInStock({...JSON.parse(product)});
@@ -17,7 +15,7 @@ const catalogBatchProcess: ValidatedEventAPIGatewayProxyEvent<any> = async (even
             await snsClient.send(
                 new PublishCommand({
                     Subject: 'Product added',
-                    Message: `Products ${product} added`,
+                    Message: `Product ${product} added`,
                     TopicArn: process.env.SNS_ARN
                 })
             );

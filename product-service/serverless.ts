@@ -22,7 +22,8 @@ const serverlessConfiguration: AWS = {
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
       PRODUCTS_TABLE: '${env:PRODUCTS_TABLE}',
       STOCKS_TABLE: '${env:STOCKS_TABLE}',
-      SNS_ARN: 'SNSTopic'
+      SQS_ARN: '${env:SQS_ARN}',
+      SNS_ARN: '${env:SNS_ARN}'
     },
     iamRoleStatements: [
       {
