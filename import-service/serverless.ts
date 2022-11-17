@@ -18,6 +18,10 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      UPLOAD_PRODUCTS_BUCKET_NAME: '${env:UPLOAD_PRODUCTS_BUCKET_NAME}',
+      SQS_URL: {
+        Ref: 'SQSQueue',
+      }
     },
     iamRoleStatements: [
       {
@@ -26,6 +30,13 @@ const serverlessConfiguration: AWS = {
         Resource: [
           '${env:S3_UPLOAD_BUCKET_ARN}',
         ]
+      },
+      {
+        Effect: 'Allow',
+        Action: 'sqs:*',
+        Resource: {
+          'Fn::GetAtt': ['SQSQueue', 'Arn'],
+        }
       }
     ],
   },
@@ -45,6 +56,29 @@ const serverlessConfiguration: AWS = {
     },
   },
   useDotenv: true,
+  resources: {
+    Resources: {
+      SQSQueue: {
+        Type: 'AWS::SQS::Queue',
+        Properties: {
+          QueueName: 'catalogItemsQueue'
+        }
+      },
+      GatewayResponseDefault4xx: {
+        Type: 'AWS::ApiGateway::GatewayResponse',
+        Properties: {
+          ResponseParameters: {
+            'gatewayresponse.header.Access-Control-Allow-Origin': "'*'",
+            'gatewayresponse.header.Access-Control-Allow-Headers': "'*'",
+          },
+          ResponseType: 'DEFAULT_4XX',
+          RestApiId: {
+            Ref: 'ApiGatewayRestApi',
+          }
+        }
+      }
+    }
+  },
 };
 
 module.exports = serverlessConfiguration;

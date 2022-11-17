@@ -1,25 +1,19 @@
 {
-  "name": "import-service",
+  "name": "authorization-service",
   "version": "1.0.0",
   "description": "Serverless aws-nodejs-typescript template",
   "main": "serverless.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "offline": "serverless offline",
     "deploy": "serverless deploy"
   },
   "engines": {
     "node": ">=14.15.0"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.194.0",
-    "@aws-sdk/client-sqs": "^3.204.0",
-    "@aws-sdk/s3-request-presigner": "^3.194.0",
     "@middy/core": "^2.5.3",
     "@middy/http-cors": "^3.5.0",
     "@middy/http-json-body-parser": "^2.5.3",
-    "aws-sdk": "^2.1238.0",
-    "csv-parser": "^3.0.0",
     "serverless-offline": "^10.2.1"
   },
   "devDependencies": {
