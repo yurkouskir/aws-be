@@ -1,0 +1,29 @@
+service: cart-service
+
+plugins:
+  - serverless-offline
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1'
+    NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000'
+    PGHOST: '${env:PGHOST}'
+    PGUSER: '${env:PGUSER}'
+    PGDATABASE: '${env:PGDATABASE}'
+    PGPASSWORD: '${env:PGPASSWORD}'
+    PGPORT: '${env:PGPORT}'
+
+functions:
+  main:
+    handler: dist/main.handler
+    events:
+      - http:
+          method: ANY
+          path: /
+      - http:
+          method: ANY
+          path: '{proxy+}'

@@ -1,0 +1,1 @@
+insert into carts values (DEFAULT, current_timestamp, current_timestamp)
